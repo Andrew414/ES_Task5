@@ -24,7 +24,8 @@
 typedef struct file_operations FILE_OPERATIONS, *PFILE_OPERATIONS;
 typedef struct cdev* CDEV, *PCDEV;
 
-typedef struct class CLASS, *PCLASS, **PCLASS_ARRAY;
+typedef struct class CLASS, *PCLASS;
+typedef PCLASS* PCLASS_ARRAY;
 
 typedef struct inode INODE, *PINODE;
 typedef struct file  FILE , *PFILE;
@@ -257,7 +258,7 @@ static void __exit calc_exit(void)
         printk(KERN_INFO "Calc driver was unloaded.\n");
 }
 
-MODULE_AUTHOR("Koloskova Anastasiya&&Fedchuk Andrew");
+MODULE_AUTHOR("Koloskova Anastasiya & Andrew Fedchuk");
 MODULE_DESCRIPTION("Calculator Driver");
 MODULE_LICENSE("GPL");
 
