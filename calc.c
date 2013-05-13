@@ -258,9 +258,5 @@ static void __exit calc_exit(void)
         printk(KERN_INFO MODULE_PREFIX "Calc driver was unloaded.\n");
 }
 
-MODULE_AUTHOR("Koloskova Anastasiya & Andrew Fedchuk");
-MODULE_DESCRIPTION("Calculator Driver");
-MODULE_LICENSE("GPL");
-
 module_init(calc_init); /* Register module entry point */
 module_exit(calc_exit); /* Register module cleaning up */
