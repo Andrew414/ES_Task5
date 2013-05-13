@@ -6,3 +6,7 @@ static ssize_t read_routine(struct file *filp, char *buffer, size_t length, loff
 static ssize_t write_routine(struct file *filp, const char *buff, size_t len, loff_t * off);
 
 #define MODULE_PREFIX "[CALC CDEV] "
+
+MODULE_AUTHOR("Koloskova Anastasiya and Andrew Fedchuk");
+MODULE_DESCRIPTION("Calculator Driver");
+MODULE_LICENSE("GPL");
