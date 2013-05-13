@@ -16,6 +16,8 @@
 #define FILENAME_ACTION "calc_action"
 #define FILENAME_RESULT "calc_result"
 
+#define STR_OUT "%s"
+
 /* Char devices maximum file size. */
 #define MAX_FILENAME 16
 #define FILES_COUNT 4
@@ -101,19 +103,19 @@ static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * of
         strcpy(name, filp->f_dentry->d_name.name);
 
         if (strcmp(name, FILENAME_FIRST) == 0) {
-                sprintf(message, "\n%s\n", devices_buffer[0]);
+                sprintf(message, STR_OUT, devices_buffer[0]);
         } else if (strcmp(name, FILENAME_SECOND) == 0) {
-                sprintf(message, "\n%s\n", devices_buffer[1]);
+                sprintf(message, STR_OUT, devices_buffer[1]);
         } else if (strcmp(name, FILENAME_ACTION) == 0) {
-                sprintf(message, "\n%s\n", devices_buffer[2]);
+                sprintf(message, STR_OUT, devices_buffer[2]);
         } else {
                 a = simple_strtol(devices_buffer[0], &end, 10);
                 if (a == 0 && (*end == devices_buffer[0][0])) {
-                        sprintf(message, "%s", "ERR_FIRST");
+                        sprintf(message, STR_OUT, "ERR_FIRST");
                 } else {
                         b = simple_strtol(devices_buffer[1], &end, 10);
                         if (b == 0 && (*end == devices_buffer[1][0])) {
-                                sprintf(message, "%s", "ERR_SECOND");
+                                sprintf(message, STR_OUT, "ERR_SECOND");
                         } else {
                                 op = devices_buffer[2][0];
                                 switch (op) {
@@ -122,7 +124,7 @@ static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * of
                                         case '*': result = a * b; break;
                                         case '/':
                                                 if (b == 0) {
-                                                        sprintf(message, "%s",
+                                                        sprintf(message, STR_OUT,
                                                                 "ERR_DIV_BY_ZERO");
                                                         written = 1;
                                                         break;
@@ -130,7 +132,7 @@ static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * of
                                                 result = a / b;
                                                 break;
                                         default:
-                                                sprintf(message, "%s", "ERR_ACTION");
+                                                sprintf(message, STR_OUT, "ERR_ACTION");
                                                 written = 1;
                                                 break;
                                 }
@@ -141,9 +143,11 @@ static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * of
                 }
         }
 
-        for(i = 0; i < length && message[i]; i++) {
+        for(i = 0; i < length && message[i] && message[i] != '\n'; i++) {
                 put_user(message[i], buffer + i);
         }
+
+        	put_user('\n', buffer + (i++));
 
         fin = 1;
 
