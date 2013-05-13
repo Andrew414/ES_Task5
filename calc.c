@@ -22,7 +22,7 @@
 #define MESSAGE_LEN 32
 
 typedef struct file_operations FILE_OPERATIONS, *PFILE_OPERATIONS;
-typedef struct cdev* CDEV, *PCDEV;
+typedef struct cdev CDEV, *PCDEV;
 
 typedef struct class CLASS, *PCLASS;
 typedef PCLASS* PCLASS_ARRAY;
@@ -109,11 +109,11 @@ static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * of
         } else {
                 a = simple_strtol(devices_buffer[0], &end, 10);
                 if (a == 0 && (*end == devices_buffer[0][0])) {
-                        sprintf(message, "\n%s\n", "First operand is not integer.");
+                        sprintf(message, "%s", "ERR_FIRST");
                 } else {
                         b = simple_strtol(devices_buffer[1], &end, 10);
                         if (b == 0 && (*end == devices_buffer[1][0])) {
-                                sprintf(message, "\n%s\n", "Second operand is not integer.");
+                                sprintf(message, "%s", "ERR_SECOND");
                         } else {
                                 op = devices_buffer[2][0];
                                 switch (op) {
@@ -122,21 +122,21 @@ static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * of
                                         case '*': result = a * b; break;
                                         case '/':
                                                 if (b == 0) {
-                                                        sprintf(message, "\n%s\n",
-                                                                "Division by zero!");
+                                                        sprintf(message, "%s",
+                                                                "ERR_DIV_BY_ZERO");
                                                         written = 1;
                                                         break;
                                                 }
                                                 result = a / b;
                                                 break;
                                         default:
-                                                sprintf(message, "\nUnknown operand: %c\n", op);
+                                                sprintf(message, "%s", "ERR_ACTION");
                                                 written = 1;
                                                 break;
                                 }
                         }
                         if (!written) {
-                                sprintf(message, "\n%ld %c %ld = %ld\n", a, op, b, result);
+                                sprintf(message, "%ld",result);
                         }
                 }
         }
