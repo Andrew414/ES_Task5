@@ -24,8 +24,7 @@
 typedef struct file_operations FILE_OPERATIONS, *PFILE_OPERATIONS;
 typedef struct cdev* CDEV, *PCDEV;
 
-typedef struct class CLASS, *PCLASS;
-typedef PCLASS* PCLASS_ARRAY;
+typedef struct class CLASS, *PCLASS, **PCLASS_ARRAY;
 
 typedef struct inode INODE, *PINODE;
 typedef struct file  FILE , *PFILE;
@@ -200,8 +199,8 @@ static int __init calc_init(void)
 
         printk(KERN_INFO "Calc driver was loaded.\n");
 
-        classes = (struct class**) kmalloc(sizeof(struct class*) * FILES_COUNT, GFP_KERNEL);
-        pDev = (struct cdev*) kmalloc(sizeof(struct cdev) * FILES_COUNT, GFP_KERNEL);
+        classes = (PCLASS_ARRAY) kmalloc(sizeof(PCLASS) * FILES_COUNT, GFP_KERNEL);
+        pDev = (PCDEV) kmalloc(sizeof(CDEV) * FILES_COUNT, GFP_KERNEL);
         devices_buffer = (char**) kmalloc(sizeof(char*) * FILES_COUNT, GFP_KERNEL);
 
         for (i = 0; i < FILES_COUNT; i++) {
