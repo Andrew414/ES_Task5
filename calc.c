@@ -11,20 +11,20 @@
 #include "calc.h"
 
 /* Char devices files names. */
-#define CALC_FIRST "calc_first"
-#define CALC_SECOND "calc_second"
-#define CALC_OPERATOR "calc_operator"
-#define CALC_RESULT "calc_result"
+#define FILENAME_FIRST "calc_first"
+#define FILENAME_SECOND "calc_second"
+#define FILENAME_ACTION "calc_action"
+#define FILENAME_RESULT "calc_result"
 
 /* Char devices maximum file size. */
-#define FILE_MAX_SIZE 16
+#define MAX_FILENAME 16
 
 /* Char devices files names. */
-static char names[][16] = {
-        CALC_FIRST,
-        CALC_SECOND,
-        CALC_OPERATOR,
-        CALC_RESULT
+static char names[][MAX_FILENAME] = {
+        FILENAME_FIRST,
+        FILENAME_SECOND,
+        FILENAME_ACTION,
+        FILENAME_RESULT
 };
 
 /* Device opened counter. */
@@ -89,11 +89,11 @@ static ssize_t device_read( struct file *filp, char *buffer, size_t length, loff
 
         strcpy(name, filp->f_dentry->d_name.name);
 
-        if (strcmp(name, CALC_FIRST) == 0) {
+        if (strcmp(name, FILENAME_FIRST) == 0) {
                 sprintf(message, "\n%s\n", devices_buffer[0]);
-        } else if (strcmp(name, CALC_SECOND) == 0) {
+        } else if (strcmp(name, FILENAME_SECOND) == 0) {
                 sprintf(message, "\n%s\n", devices_buffer[1]);
-        } else if (strcmp(name, CALC_OPERATOR) == 0) {
+        } else if (strcmp(name, FILENAME_ACTION) == 0) {
                 sprintf(message, "\n%s\n", devices_buffer[2]);
         } else {
                 a = simple_strtol(devices_buffer[0], &end, 10);
@@ -153,18 +153,18 @@ static ssize_t device_write(struct file *filp, const char *buff, size_t len, lof
 
         strcpy(name, filp->f_dentry->d_name.name);
 
-        if (strcmp(name, CALC_FIRST) == 0) {
+        if (strcmp(name, FILENAME_FIRST) == 0) {
                 index = 0;
-        } else if (strcmp(name, CALC_SECOND) == 0) {
+        } else if (strcmp(name, FILENAME_SECOND) == 0) {
                 index = 1;
-        } else if (strcmp(name, CALC_OPERATOR) == 0) {
+        } else if (strcmp(name, FILENAME_ACTION) == 0) {
                 index = 2;
         } else {
                 index = 3;
         }
 
-        if (len >= FILE_MAX_SIZE) {
-                buf_size = FILE_MAX_SIZE - 1;
+        if (len >= MAX_FILENAME) {
+                buf_size = MAX_FILENAME - 1;
         } else {
                 buf_size = len;
         }
@@ -194,7 +194,7 @@ static int __init calc_init(void)
         devices_buffer = (char**) kmalloc(sizeof(char*) * 4, GFP_KERNEL);
 
         for (i = 0; i < 4; i++) {
-                devices_buffer[i] = (char*) kmalloc(sizeof(char) * FILE_MAX_SIZE, GFP_KERNEL);
+                devices_buffer[i] = (char*) kmalloc(sizeof(char) * MAX_FILENAME, GFP_KERNEL);
                 devices_buffer[i][0] = '\0';
         }
 
