@@ -21,6 +21,15 @@
 #define FILES_COUNT 4
 #define MESSAGE_LEN 32
 
+typedef struct file_operations FILE_OPERATIONS, *PFILE_OPERATIONS;
+typedef struct cdev* CDEV, *PCDEV;
+
+typedef struct class CLASS, *PCLASS;
+typedef PCLASS* PCLASS_ARRAY;
+
+typedef struct inode INODE, *PINODE;
+typedef struct file  FILE , *PFILE;
+
 /* Char devices files names. */
 static char names[][MAX_FILENAME] = {
         FILENAME_FIRST,
@@ -38,32 +47,25 @@ static char** devices_buffer;
 /* User message. */
 static char message[MESSAGE_LEN];
 
-typedef struct file_operations FILE_OPERATIONS, *PFILE_OPERATIONS;
-
 /* Device operations struct. */
 static FILE_OPERATIONS fops = {
         .owner = THIS_MODULE,
-        .read = device_read,
-        .write = device_write,
-        .open = device_open,
-        .release = device_release
+        .read = read_routine,
+        .write = write_routine,
+        .open = open_routine,
+        .release = release_routine
 };
 
 /* Devices numbers. */
 static dev_t numbers[FILES_COUNT];
 
-typedef struct cdev* CDEV, *PCDEV;
-
 /* Global var for the character device struct */
 static PCDEV pDev;
-
-typedef struct class CLASS, *PCLASS;
-typedef PCLASS* PCLASS_ARRAY;
 
 /* Global var for the device class */
 static PCLASS_ARRAY classes;
 
-static int device_open(struct inode *inode, struct file *file)
+static int open_routine(PINODE inode, PFILE file)
 {
         if (device_opened)
                 return -EBUSY;
@@ -74,7 +76,7 @@ static int device_open(struct inode *inode, struct file *file)
         return 0;
 }
 
-static int device_release(struct inode *inode, struct file *file)
+static int release_routine(PINODE inode, PFILE file)
 {
         device_opened--;
 
@@ -83,7 +85,7 @@ static int device_release(struct inode *inode, struct file *file)
         return 0;
 }
 
-static ssize_t device_read( struct file *filp, char *buffer, size_t length, loff_t * offset)
+static ssize_t read_routine(PFILE filp, char *buffer, size_t length, loff_t * offset)
 {
         static int fin = 0;
         long a, b, result = 0;
@@ -148,7 +150,7 @@ static ssize_t device_read( struct file *filp, char *buffer, size_t length, loff
         return i;
 }
 
-static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t * off)
+static ssize_t write_routine(PFILE filp, const char *buff, size_t len, loff_t * off)
 {
         static int fin = 0;
         char name[MESSAGE_LEN];
@@ -198,16 +200,16 @@ static int __init calc_init(void)
 
         printk(KERN_INFO "Calc driver was loaded.\n");
 
-        classes = (struct class**) kmalloc(sizeof(struct class*) * 4, GFP_KERNEL);
-        pDev = (struct cdev*) kmalloc(sizeof(struct cdev) * 4, GFP_KERNEL);
-        devices_buffer = (char**) kmalloc(sizeof(char*) * 4, GFP_KERNEL);
+        classes = (struct class**) kmalloc(sizeof(struct class*) * FILES_COUNT, GFP_KERNEL);
+        pDev = (struct cdev*) kmalloc(sizeof(struct cdev) * FILES_COUNT, GFP_KERNEL);
+        devices_buffer = (char**) kmalloc(sizeof(char*) * FILES_COUNT, GFP_KERNEL);
 
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < FILES_COUNT; i++) {
                 devices_buffer[i] = (char*) kmalloc(sizeof(char) * MAX_FILENAME, GFP_KERNEL);
                 devices_buffer[i][0] = '\0';
         }
 
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < FILES_COUNT; i++) {
                 if (alloc_chrdev_region(&numbers[i], 0, 1, names[i]) < 0) {
                         return -1;
                 }
@@ -242,7 +244,7 @@ static void __exit calc_exit(void)
 {
         int i;
 
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < FILES_COUNT; i++) {
                 cdev_del(&pDev[i]);
                 device_destroy(classes[i], numbers[i]);
                 class_destroy(classes[i]);
