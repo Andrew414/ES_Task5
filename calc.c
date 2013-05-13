@@ -182,7 +182,7 @@ static ssize_t write_routine(PFILE filp, const char *buff, size_t len, loff_t * 
 
         if (index != 3) {
                 if (copy_from_user(devices_buffer[index], buff, buf_size)) {
-                                printk(KERN_ERR "Failed to write to /dev/%s\n", names[index]);
+                                printk(KERN_ERR MODULE_PREFIX "Failed to write to /dev/%s\n", names[index]);
                                 return -EFAULT;
                 }
                 devices_buffer[index][buf_size + 1] = '\0';
@@ -198,7 +198,7 @@ static int __init calc_init(void)
 {
         int i = 0;
 
-        printk(KERN_INFO "Calc driver was loaded.\n");
+        printk(KERN_INFO MODULE_PREFIX "Calc driver was loaded.\n");
 
         classes = (PCLASS_ARRAY) kmalloc(sizeof(PCLASS) * FILES_COUNT, GFP_KERNEL);
         pDev = (PCDEV) kmalloc(sizeof(CDEV) * FILES_COUNT, GFP_KERNEL);
@@ -235,7 +235,7 @@ static int __init calc_init(void)
                 }
         }
 
-        printk(KERN_INFO "Calc driver devices were created.\n");
+        printk(KERN_INFO MODULE_PREFIX "Calc driver devices were created.\n");
         return 0;
 }
 
@@ -254,8 +254,8 @@ static void __exit calc_exit(void)
 
         kfree(devices_buffer);
 
-        printk(KERN_INFO "Calc driver devices were removed.\n");
-        printk(KERN_INFO "Calc driver was unloaded.\n");
+        printk(KERN_INFO MODULE_PREFIX "Calc driver devices were removed.\n");
+        printk(KERN_INFO MODULE_PREFIX "Calc driver was unloaded.\n");
 }
 
 MODULE_AUTHOR("Koloskova Anastasiya & Andrew Fedchuk");
